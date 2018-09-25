@@ -4,16 +4,17 @@
 import random
 import math
 from math import radians, cos, sin, asin, sqrt
+import matplotlib.pyplot as plt
 
 
-# 计算两点间距离-m
+# 计算两经纬度距离
 def geodistance(lng1, lat1, lng2, lat2):
     lng1, lat1, lng2, lat2 = map(radians, [lng1, lat1, lng2, lat2])
     dlon = lng2 - lng1
     dlat = lat2 - lat1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     dis = 2 * asin(sqrt(a)) * 6371 * 1000
-    return dis
+    return dis / 1000.
 
 
 SCORE_NONE = -1
@@ -31,7 +32,6 @@ class GA(object):
     """遗传算法类"""
 
     def __init__(self, aCrossRate, aMutationRage, aLifeCount, aGeneLenght, aMatchFun):
-        # lambda作为一个表达式，定义了一个匿名函数
         self.croessRate = aCrossRate  # 交叉概率
         self.mutationRate = aMutationRage  # 突变概率
         self.lifeCount = aLifeCount  # 种群中个体数量
@@ -85,11 +85,6 @@ class GA(object):
             if (self.matchFun(Life(newGene)) > max(self.matchFun(parent1), self.matchFun(parent2))):
                 self.crossCount += 1
                 return newGene
-                # else:
-            #       rate = random.random()
-            #       if rate < math.exp(-100 / math.sqrt(self.generation)):
-            #             self.crossCount += 1
-            #             return newGene
             if (n > 100):
                 self.crossCount += 1
                 return newGene
@@ -153,8 +148,8 @@ class TSP(object):
     def __init__(self, aLifeCount=100, ):
         self.initCitys()
         self.lifeCount = aLifeCount
-        self.ga = GA(aCrossRate=0.7,
-                     aMutationRage=0.02,
+        self.ga = GA(aCrossRate=0.4,
+                     aMutationRage=0.2,
                      aLifeCount=self.lifeCount,
                      aGeneLenght=len(self.citys),
                      aMatchFun=self.matchFun())
@@ -203,23 +198,43 @@ class TSP(object):
         for i in range(-1, len(self.citys) - 1):
             index1, index2 = order[i], order[i + 1]
             city1, city2 = self.citys[index1], self.citys[index2]
-            distance = geodistance(city1[0], city1[1], city2[0], city2[1])
+            distance += geodistance(city1[0], city1[1], city2[0], city2[1])
         return distance
 
     def matchFun(self):
         return lambda life: 1.0 / self.distance(life.gene)
 
-    def run(self, n=0):
+    def main(self, n=0):
         while n > 0:
             self.ga.next()
             distance = self.distance(self.ga.best.gene)
-            print(("Generation: %4d \t\t Distance: %f") % (self.ga.generation - 1, distance))  # 输出当前代数和路径长度
+            # print(("Generation: %4d \t\t Distance: %f") % (self.ga.generation - 1, distance))  # 输出当前代数和路径长度
             self.ga.best.gene.append(self.ga.best.gene[0])
-            print("Path: ", self.ga.best.gene)  # 输出当前最佳路径
+            # print("Path: ", self.ga.best.gene)  # 输出当前最佳路径
             self.ga.best.gene.pop()
             n -= 1
 
 
+def draw(bestPath, cities):
+    ax = plt.subplot(111, aspect='equal')
+    x = []
+    y = []
+    for i in range(-1, len(cities) - 1):
+        index = bestPath[i]
+        city = cities[index]
+        x.append(city[0])
+        y.append(city[1])
+    x.append(x[0])
+    y.append(y[0])
+    ax.plot(x, y)
+    plt.show()
+
+
 if __name__ == '__main__':
+    bp = [3, 29, 28, 16, 15, 1, 11, 10, 9, 0, 12, 13, 7, 6, 27, 14, 5, 4, 31, 30, 8, 26, 33, 32, 24, 20, 25, 19, 2, 17,
+          18,
+          23, 21, 22, 3]
     tsp = TSP()
-    tsp.run(100)
+    print(tsp.distance(bp))
+    # tsp.main(400)
+    # draw(bp, tsp.citys)

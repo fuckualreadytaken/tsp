@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 # coding=utf-8
 import random
-import numpy as np
 import matplotlib.pyplot as plt
 
 # 用遗传算法求解f(x) = x^2 + x + 3 在[0, 32）上的最大值
@@ -32,7 +31,7 @@ def decode(chromosome):
 
 def fit(num):
     # 适应度函数
-    return num * num + num + 3
+    return num * num - num + 3
 
 
 def max_dic(dic):
@@ -119,11 +118,13 @@ def GA(num):
     return population[0]
 
 
-def plot_(i):
-    y = get_data(100, 22)
+def plot_(i, n):
+    y = get_data(100, n)
     x = range(i)
-    plt.plot(x, y)
-    plt.show()
+    fig1 = plt.figure()
+    ax = fig1.add_subplot(111)
+    ax.scatter(x, y)
+    # plt.show()
 
 
 def get_data(n, num):
@@ -157,14 +158,23 @@ def cal_rate(data):
 
 
 if __name__ == "__main__":
-    # plot_(100)
-    # GA(10)
+    # x = range(100)
+    # y1 = get_data(100, 4)
+    # y2 = get_data(100, 6)
+    # fig = plt.figure(figsize=(10, 5))
+    # ax1 = fig.add_subplot(121)
+    # ax1.scatter(x, y1)
+    # ax1.set_title("4 Individuals")
+    # ax2 = fig.add_subplot(122)
+    # ax2.scatter(x, y2)
+    # ax2.set_title("6 Individuals")
+    # plt.show()
+    # print(GA(4))
     # cal_rate(get_data(10, 10))
     # cal_rate(get_data(100, 10))
     # cal_rate(get_data(1000, 10))
     # cal_rate(get_data(10000, 10))
     # cal_rate(get_data(100000, 10))
-    # for
     # cal_rate(get_data(100000, 12))
     x = range(4, 24, 2)
     y = []
